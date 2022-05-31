@@ -159,6 +159,43 @@ public class NameCardsDAO {
     }
   }
 
+  public static void insert(NameCard name_card) throws SQLException {
+    try {
+      Connection con = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/~/business_card", "sa", "");
+      
+      String sql = "INSERT INTO NAMECARDS(person_lname, person_fname, person_title, person_email, person_tel, dept_name, office_zip, office_address, office_tel, office_fax, company_name, company_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      PreparedStatement pstmt = con.prepareStatement(sql);
+
+      pstmt.setString(1, name_card.getPersonLname());
+      pstmt.setString(2, name_card.getPersonFname());
+      pstmt.setString(3, name_card.getPersonTitle());
+      pstmt.setString(4, name_card.getPersonEmail());
+      pstmt.setString(5, name_card.getPersonTel());
+      pstmt.setString(6, name_card.getDeptName());
+      pstmt.setString(7, name_card.getOfficeZip());
+      pstmt.setString(8, name_card.getOfficeAddress());
+      pstmt.setString(9, name_card.getOfficeTel());
+      pstmt.setString(10, name_card.getOfficeFax());
+      pstmt.setString(11, name_card.getCompanyName());
+      pstmt.setString(12, name_card.getCompanyUrl());
+      System.out.println(pstmt);
+      int result = pstmt.executeUpdate();
+
+      if (result == 1) {
+        ResultSet rs = pstmt.getGeneratedKeys();
+        if (rs.next()) {
+          int id = rs.getInt(1);
+          System.out.println("管理番号" + id + " として登録しました");
+        }
+      } else {
+        System.out.println("登録できませんでした");
+      }
+    }
+    catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
 
 
 }

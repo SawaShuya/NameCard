@@ -10,8 +10,9 @@ public class Main {
 
 	public static void mainmenu() {
 		System.out.println("名刺管理システム\n");
+		System.out.println("<<メインメニュー>>");
 		System.out.println("1.名前一覧の表示");
-		System.out.println("2.機能2");
+		System.out.println("2.名刺情報の追加");
 		System.out.println("3.機能3");
 		System.out.println("9.終了");
 		System.out.println("何をしますか？(1-9: 機能の実行)");
@@ -25,7 +26,8 @@ public class Main {
 			index();
 			break;
 		case 2:
-			System.out.println("機能2を実行します");
+			System.out.println("名刺情報の追加します");
+			create();
 			break;
 		case 3:
 			System.out.println("機能3を実行します");
@@ -115,6 +117,64 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+
+	public static void create() {
+		NameCard name_card = input();
+
+		try {
+			NameCard.insert(name_card);
+			mainmenu();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static NameCard input() {
+		NameCard name_card = new NameCard();
+
+		System.out.println("新たな名刺に関する情報を入力てください");
+
+		System.out.println("姓（必須）");
+		Scanner sc = new Scanner(System.in);
+		name_card.setPersonLname(sc.nextLine());
+
+		System.out.println("名（必須）");
+		name_card.setPersonFname(sc.nextLine());
+
+		System.out.println("会社名（必須）");
+		name_card.setCompanyName(sc.nextLine());
+
+		System.out.println("会社URL");
+		name_card.setCompanyUrl(sc.nextLine());
+
+		System.out.println("事務所郵便番号");
+		name_card.setOfficeZip(sc.nextLine());
+
+		System.out.println("事務所住所");
+		name_card.setOfficeAddress(sc.nextLine());
+
+		System.out.println("事務所TEL");
+		name_card.setOfficeTel(sc.nextLine());
+
+		System.out.println("事務所FAX");
+		name_card.setOfficeFax(sc.nextLine());
+
+		System.out.println("部署名");
+		name_card.setDeptName(sc.nextLine());
+
+		System.out.println("役職名");
+		name_card.setPersonTitle(sc.nextLine());
+
+		System.out.println("個人メール");
+		name_card.setPersonEmail(sc.nextLine());
+
+		System.out.println("個人TEL");
+		name_card.setPersonTel(sc.nextLine());
+
+		return name_card;
+	}
+
+	
 
 
 

@@ -46,7 +46,7 @@ public class NameCard extends NameCardsDAO {
     this.person_lname = person_lname;
   }
 
-  public String getPersonTname() {
+  public String getPersonFname() {
     return person_fname;
   }
 
