@@ -13,7 +13,7 @@ public class Main {
 		System.out.println("<<メインメニュー>>");
 		System.out.println("1.名前一覧の表示");
 		System.out.println("2.名刺情報の追加");
-		System.out.println("3.機能3");
+		System.out.println("3.名刺情報の検索");
 		System.out.println("9.終了");
 		System.out.println("何をしますか？(1-9: 機能の実行)");
 
@@ -30,44 +30,23 @@ public class Main {
 			create();
 			break;
 		case 3:
-			System.out.println("機能3を実行します");
+			System.out.println("名刺情報の検索します");
+			search();
 			break;
 		case 9:
 			System.out.println("終了します");
+			break;
+		default:
+			System.out.println("正しく入力してください");
+			mainmenu();
 			break;
 		}
 	}
 
 	public static void index() {
-		int count = 0;
 		try {
 			List<NameCard> name_cards = NameCard.selectAll();
-			for (NameCard name_card : name_cards) {
-				count++;
-				System.out.print(count + ". ");
-				System.out.println(name_card);
-			}
-
-			if (count == 0) {
-				System.out.println("名刺はありません, enter:メニューに戻る");
-			} else if (count == 1){
-				System.out.println("何をしますか？ 1: 詳細を見る, enter:メニューに戻る)");
-			} else {
-				System.out.println("何をしますか？ 1-" + count + ": 詳細を見る, enter:メニューに戻る)");
-			}
-			Scanner sc = new Scanner(System.in);
-			String input = sc.nextLine();
-	
-			if (input.matches("[0-9]{1,}") && Integer.parseInt(input) <= count) {
-				int num = Integer.parseInt(input) - 1;
-				show(name_cards.get(num).getId());
-			} else if (input.matches("")) {
-				mainmenu();
-			} else {
-				System.out.println("入力が正しくありません。");
-				index();
-			}
-			
+			print_index(name_cards);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
@@ -81,9 +60,10 @@ public class Main {
 
 		try {
 			NameCard name_card = NameCard.select(id);
+			
 			System.out.println(name_card.detail());
 
-			System.out.println("何をしますか？ enter:メニューに戻る, d:削除");
+			System.out.println("何をしますか？ enter:メニューに戻る, d:削除 u:更新");
 			Scanner sc = new Scanner(System.in);
 			String input = sc.nextLine();
 
@@ -91,11 +71,14 @@ public class Main {
 				System.out.println("本当に削除しますか？ (y/n)");
 				String delete_flag = sc.nextLine();
 				if (delete_flag.matches("[yY]")) {
-					delete(name_card.getId());
+					delete(id);
 				} else {
 					System.out.println("削除をキャンセルしました");
 					show(id);
 				}
+			}else if(input.matches("[uU]")) {
+				update(id);
+
 			} else if (input.matches("")) {
 				mainmenu();
 			} else {
@@ -119,7 +102,10 @@ public class Main {
 	}
 
 	public static void create() {
-		NameCard name_card = input();
+		
+		System.out.println("新たな名刺に関する情報を入力てください");
+		NameCard name_card = new NameCard();
+		input(name_card);
 
 		try {
 			NameCard.insert(name_card);
@@ -128,54 +114,148 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public static void update(int id) {
+		System.out.println("更新情報を入力してください");
+		try {
+			NameCard name_card = NameCard.select(id);
+			input(name_card);
+			NameCard.update(name_card);
+			mainmenu();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-	public static NameCard input() {
-		NameCard name_card = new NameCard();
-
-		System.out.println("新たな名刺に関する情報を入力てください");
-
-		System.out.println("姓（必須）");
+	public static void search() {
+		System.out.print("検索したい文字列を入力 > ");
 		Scanner sc = new Scanner(System.in);
-		name_card.setPersonLname(sc.nextLine());
+		String input = sc.nextLine();
 
-		System.out.println("名（必須）");
-		name_card.setPersonFname(sc.nextLine());
+		try {
+			List<NameCard> name_cards = NameCard.search_for(input);
+			print_index(name_cards);
 
-		System.out.println("会社名（必須）");
-		name_card.setCompanyName(sc.nextLine());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
-		System.out.println("会社URL");
+	public static NameCard input(NameCard name_card) {
+		Scanner sc = new Scanner(System.in);
+
+		while(true) {
+			print_item("姓", name_card.getPersonLname());
+			String last_name = sc.nextLine();
+			if (is_present(name_card.getPersonFname(), last_name) ){
+				name_card.setPersonLname(last_name);
+				break;
+			}
+		}
+
+		while(true) {
+			print_item("名", name_card.getPersonFname());
+			String first_name = sc.nextLine();
+			if (is_present(name_card.getPersonFname(), first_name) ){
+				name_card.setPersonFname(first_name);
+				break;
+			}
+		}
+
+		while(true) {
+			print_item("会社名", name_card.getCompanyName());
+			String company_name = sc.nextLine();
+			if (is_present(name_card.getPersonFname(), company_name) ){
+				name_card.setCompanyName(company_name);
+				break;
+			}
+		}
+
+		print_item("会社URL", name_card.getCompanyUrl());
 		name_card.setCompanyUrl(sc.nextLine());
 
-		System.out.println("事務所郵便番号");
+		print_item("事務所郵便番号", name_card.getOfficeTel());
 		name_card.setOfficeZip(sc.nextLine());
 
-		System.out.println("事務所住所");
+		print_item("事務所住所", name_card.getOfficeAddress());
 		name_card.setOfficeAddress(sc.nextLine());
 
-		System.out.println("事務所TEL");
+		print_item("事務所TEL", name_card.getOfficeTel());
 		name_card.setOfficeTel(sc.nextLine());
 
-		System.out.println("事務所FAX");
+		print_item("事務所FAX", name_card.getOfficeFax());
 		name_card.setOfficeFax(sc.nextLine());
 
-		System.out.println("部署名");
+		print_item("部署名", name_card.getDeptName());
 		name_card.setDeptName(sc.nextLine());
 
-		System.out.println("役職名");
+		print_item("役職名", name_card.getPersonTitle());
 		name_card.setPersonTitle(sc.nextLine());
 
-		System.out.println("個人メール");
+		print_item("個人メール", name_card.getPersonEmail());
 		name_card.setPersonEmail(sc.nextLine());
 
-		System.out.println("個人TEL");
+		print_item("個人TEL", name_card.getPersonTel());
 		name_card.setPersonTel(sc.nextLine());
 
 		return name_card;
 	}
 
-	
+	public static void print_index(List<NameCard> name_cards) {
+		int count = 0;
+		for (NameCard name_card : name_cards) {
+			count++;
+			System.out.print(count + ". ");
+			System.out.println(name_card);
+		}
 
+		if (count == 0) {
+			System.out.println("名刺はありません, enter:メニューに戻る");
+		} else if (count == 1){
+			System.out.println("何をしますか？ 1: 詳細を見る, enter:メニューに戻る)");
+		} else {
+			System.out.println("何をしますか？ 1-" + count + ": 詳細を見る, enter:メニューに戻る)");
+		}
+		Scanner sc = new Scanner(System.in);
+		String input = sc.nextLine();
+
+		if (input.matches("[0-9]{1,}") && Integer.parseInt(input) <= count) {
+			int num = Integer.parseInt(input) - 1;
+			show(name_cards.get(num).getId());
+		} else if (input.matches("")) {
+			mainmenu();
+		} else {
+			System.out.println("入力が正しくありません。");
+			mainmenu();
+		}
+
+	}
+
+	public static boolean is_present(String original_str, String str) {
+		if (str.matches("") && original_str.matches("")) {
+			System.out.println("入力が正しくありません。");
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static void print_item(String column, String original) {
+		String nesesity = "";
+
+		if (column.matches("姓|名|会社名")) {
+			nesesity = " *必須 ";
+		}
+
+		if (original == null) {
+			System.out.print(column + nesesity + " > ");
+		} else {
+			System.out.print(column + nesesity + " (saved: " + original + ") > " );
+		}
+		
+	}
 
 
 }
