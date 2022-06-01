@@ -15,22 +15,7 @@ public class NameCard extends NameCardsDAO {
   private String company_name;
   private String company_url;
 
-
-  // public NameCard(String person_lname, String person_fname, String person_title, String person_email, String person_tel, String dept_name, String office_zip, String office_address, String office_tel, String office_fax, String company_name, String company_url) {
-  //   this.person_lname = person_lname;
-  //   this.person_fname = person_fname;
-  //   this.person_title = person_title;
-  //   this.person_email = person_email;
-  //   this.person_tel = person_tel;
-  //   this.dept_name = dept_name;
-  //   this.office_zip = office_zip;
-  //   this.office_address = office_address;
-  //   this.office_tel = office_tel;
-  //   this.office_fax = office_fax;
-  //   this.company_name = company_name;
-  //   this.company_url = company_url;
-  // }
-
+  // getter/setter
   public int getId() {
     return id;
   }
@@ -135,6 +120,7 @@ public class NameCard extends NameCardsDAO {
     this.company_url = common_check(this.company_url, _company_url);
   }
 
+  // how to display
   public String detail() {
     return  "管理番号: " + id + '\n' +
             "氏　　名: " + person_lname + ' ' + person_fname + '\n' +
@@ -150,9 +136,14 @@ public class NameCard extends NameCardsDAO {
             "W  e  b : " + company_url + '\n';
   }
 
-  
+  @Override 
+  public String toString() {
+    return person_lname + " " + person_fname + " " + company_name +" " + person_title;
+  }
+
+
+  // check processes
   public String common_check(String original_str, String str) {
-	
     if (Objects.equals(original_str, str)) {
       return original_str;
     } else {
@@ -178,13 +169,5 @@ public class NameCard extends NameCardsDAO {
       return str;
     } 
   }
-
-
-  @Override 
-  public String toString() {
-    return person_lname + " " + person_fname + " " + company_name +" " + person_title;
-  }
-
-
 
 }

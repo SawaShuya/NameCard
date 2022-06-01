@@ -23,19 +23,6 @@ public class NameCardsDAO {
     }
   }
 
-  // public void close() {
-  //   try {
-  //     if (rs != null) {
-  //       rs.close();
-  //     }
-  //     if (pstmt != null) {
-  //       pstmt.close();
-  //     }
-  //   } catch (SQLException e) {
-  //     throw new IllegalStateException("データベースの接続を閉じる際にエラーが発生しました");
-  //   }
-  // }
-
   public static NameCard select(int id) throws SQLException {
     Connection con = set_connection();
     try {
@@ -56,7 +43,6 @@ public class NameCardsDAO {
   }
 
   public static List<NameCard> selectAll() throws SQLException {
-
     try {
       Connection con = set_connection();
       
@@ -130,6 +116,7 @@ public class NameCardsDAO {
       pstmt = get_pstmt(name_card, pstmt);
       pstmt.setInt(13, name_card.getId());
       int result = pstmt.executeUpdate();
+      pstmt.close();
 
       if (result == 1) {
         System.out.println("更新しました\n");
